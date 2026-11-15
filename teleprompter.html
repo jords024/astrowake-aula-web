@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎬 TELEPROMPTER DO APRESENTADOR — ROTEIRO COMPLETO + SLIDES SINCRONIZADOS</title>
+  <style>
+    :root {
+      --bg-deep: #07080B;
+      --bg-panel: #101218;
+      --bg-card: #161922;
+      --bg-active: #1D212D;
+      --offwhite: #F4F3EF;
+      --muted: #8E95A5;
+      --amber: #E8A838;
+      --copper: #C65C20;
+      --green: #22C55E;
+      --line: #262A36;
+      --font-size-script: 26px;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg-deep);
+      color: var(--offwhite);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Top Control Header */
+    #top-studio-bar {
+      height: 68px;
+      background: rgba(16, 18, 24, 0.98);
+      border-bottom: 2px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+    }
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .live-pill {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid var(--green);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+      padding: 5px 11px;
+      border-radius: 999px;
+      letter-spacing: 0.6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+    }
+    .studio-h1 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--offwhite);
+      letter-spacing: 0.3px;
+    }
+    .studio-h1 span {
+      color: var(--amber);
+    }
+
+    /* Teleprompter Controls Group */
+    .ctrl-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .studio-btn {
+      background: var(--bg-card);
+      color: var(--offwhite);
+      border: 1px solid var(--line);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .studio-btn:hover {
+      border-color: var(--amber);
+      color: var(--amber);
+    }
+    .studio-btn.active-toggle {
+      background: var(--amber);
+      color: #07080B;
+      border-color: var(--amber);
+    }
+    .speed-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card);
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .speed-box input[type="range"] {
+      width: 85px;
+      accent-color: var(--amber);
+      cursor: pointer;
+    }
+
+    /* Main Studio Split Layout */
+    #studio-body {
+      display: grid;
+      grid-template-columns: 1fr 390px;
+      height: calc(100vh - 68px);
+      overflow: hidden;
+    }
+
+    /* Left Column: Continuous Full-Script Teleprompter Stream */
+    #prompter-column {
+      position: relative;
+      height: 100%;
+      overflow-y: auto;
+      padding: 40px 52px 55vh 52px;
+      scroll-behavior: smooth;
+    }
+    /* Eye-level Reading Guide Line */
+    #reading-guide {
+      position: fixed;
+      top: 230px;
+      left: 0;
+      width: calc(100% - 390px);
+      height: 0;
+      border-top: 2px dashed rgba(232, 168, 56, 0.28);
+      pointer-events: none;
+      z-index: 40;
+    }
+    #reading-guide::after {
+      content: "👁️ ZONA DE LEITURA";
+      position: absolute;
+      right: 16px;
+      top: -22px;
+      font-size: 10px;
+      font-weight: 800;
+      color: rgba(232, 168, 56, 0.65);
+      background: rgba(7, 8, 11, 0.85);
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.6px;
+    }
+
+    .prompter-intro-banner {
+      background: linear-gradient(90deg, rgba(232, 168, 56, 0.14), rgba(198, 92, 32, 0.08));
+      border: 1px solid rgba(232, 168, 56, 0.4);
+      border-radius: 12px;
+      padding: 16px 22px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .prompter-intro-banner h2 {
+      font-size: 16px;
+      color: var(--amber);
+      font-weight: 800;
+    }
+    .prompter-intro-banner p {
+      font-size: 13px;
+      color: var(--offwhite);
+      margin-top: 4px;
+    }
+
+    /* Individual Slide Script Block in Continuous Stream */
+    .script-block {
+      background: var(--bg-panel);
+      border: 2px solid var(--line);
+      border-left: 6px solid #323746;
+      border-radius: 14px;
+      padding: 26px 32px;
+      margin-bottom: 26px;
+      opacity: 0.36;
+      transition: opacity 0.28s ease, border-color 0.28s ease, background 0.28s ease, transform 0.28s ease, box-shadow 0.28s ease;
+      cursor: pointer;
+    }
+    .script-block:hover {
+      opacity: 0.72;
+    }
+    /* ACTIVE SLIDE BLOCK: Bold, Bright, Glowing Amber Indicator */
+    .script-block.active-slide {
+      opacity: 1;
+      background: var(--bg-active);
+      border-color: var(--amber);
+      border-left: 10px solid var(--amber);
+      box-shadow: 0 14px 45px rgba(232, 168, 56, 0.14);
+      transform: scale(1.006);
+    }
+
+    .block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .block-badges {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .slide-num-pill {
+      background: #282D3C;
+      color: var(--offwhite);
+      font-weight: 900;
+      font-size: 13px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+    .script-block.active-slide .slide-num-pill {
+      background: var(--amber);
+      color: #07080B;
+    }
+    .on-air-indicator {
+      display: none;
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid var(--green);
+      color: #4ADE80;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+    .script-block.active-slide .on-air-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .block-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--offwhite);
+    }
+    .script-block.active-slide .block-title {
+      color: var(--amber);
+    }
+    .block-cue {
+      font-size: 13px;
+      color: var(--muted);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 6px 12px;
+      border-radius: 6px;
+      margin-bottom: 18px;
+      border-left: 3px solid var(--copper);
+    }
+
+    /* Script Paragraphs */
+    .block-content {
+      font-size: var(--font-size-script);
+      line-height: 1.62;
+      color: #D5D8E0;
+      font-weight: 500;
+    }
+    .script-block.active-slide .block-content {
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+    .block-content p {
+      margin-bottom: 18px;
+    }
+    .block-content p:last-child {
+      margin-bottom: 0;
+    }
+    .block-content strong {
+      color: #FFFFFF;
+      font-weight: 800;
+      text-decoration: underline;
+      text-decoration-color: rgba(232, 168, 56, 0.55);
+      text-underline-offset: 4px;
+    }
+    .block-content .hl-amber {
+      background: rgba(232, 168, 56, 0.22);
+      color: #FFD175;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 5px;
+    }
+
+    /* Right Sidebar: Live Slide Monitor + Quick Jump Index */
+    #monitor-sidebar {
+      background: var(--bg-panel);
+      border-left: 2px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 20px;
+      overflow-y: auto;
+      gap: 18px;
+    }
+    .monitor-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .monitor-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--amber);
+      letter-spacing: 0.6px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .monitor-img-wrap {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid var(--amber);
+      margin-bottom: 12px;
+    }
+    .monitor-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .nav-buttons-big {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .nav-btn-big {
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 800;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid var(--line);
+      background: var(--bg-panel);
+      color: var(--offwhite);
+      transition: all 0.15s ease;
+    }
+    .nav-btn-big.next {
+      background: var(--amber);
+      color: #07080B;
+      border-color: var(--amber);
+    }
+    .nav-btn-big:hover {
+      filter: brightness(1.1);
+    }
+
+    /* Slide Quick Jump List */
+    .jump-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 360px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .jump-item {
+      padding: 8px 10px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid transparent;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+    .jump-item:hover {
+      color: var(--offwhite);
+      background: rgba(255,255,255,0.07);
+    }
+    .jump-item.active {
+      background: rgba(232, 168, 56, 0.18);
+      border-color: var(--amber);
+      color: var(--offwhite);
+      font-weight: 800;
+    }
+    .jump-item span.num {
+      color: var(--amber);
+      font-weight: 800;
+      min-width: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <header id="top-studio-bar">
+    <div class="brand-title">
+      <span class="live-pill"><span class="live-dot"></span> VISÃO EXCLUSIVA DO APRESENTADOR</span>
+      <div class="studio-h1">🎬 ROTEIRO COMPLETO DE FALA + <span>SEQUÊNCIA DE SLIDES</span></div>
+    </div>
+
+    <div class="ctrl-group">
+      <button class="studio-btn" id="btn-autoscroll" title="Liga/Desliga a rolagem automática contínua do Teleprompter">▶ Rolagem Automática: OFF</button>
+      <div class="speed-box">
+        <span>Velocidade:</span>
+        <input type="range" id="speed-slider" min="1" max="10" step="1" value="3" />
+        <span id="speed-val">3x</span>
+      </div>
+      <button class="studio-btn active-toggle" id="btn-scroll-sync" title="Quando ativado, rolar o texto com o mouse também destaca e avança o slide automaticamente">🔗 Sincronizar Slide ao Rolar: ON</button>
+      <button class="studio-btn" id="btn-font-dec" title="Diminuir fonte">A-</button>
+      <button class="studio-btn" id="btn-font-inc" title="Aumentar fonte">A+</button>
+      <button class="studio-btn" id="btn-open-clean-stage" title="Abre a guia limpa de slides para compartilhar no Google Meet">🖥️ Abrir Guia Limpa p/ Meet</button>
+    </div>
+  </header>
+
+  <div id="reading-guide"></div>
+
+  <main id="studio-body">
+    <!-- Continuous Full Script Stream (All 21 Slides) -->
+    <section id="prompter-column">
+      <div class="prompter-intro-banner">
+        <div>
+          <h2>COMO USAR NO GOOGLE MEET (PASSO A PASSO SIMPLES):</h2>
+          <p>1. Compartilhe no Google Meet <b>APENAS a Guia Limpa dos Slides</b> (os alunos verão somente os slides em tela cheia).<br/>
+             2. Mantenha <b>esta janela do Teleprompter</b> aberta para você: role livremente com o <b>scroll do mouse</b>, use as <b>setas ◀ ▶</b> ou ligue a <b>Rolagem Automática</b>. O bloco do slide atual fica sempre <b>aceso em destaque dourado e negrito</b>!</p>
+        </div>
+      </div>
+
+      <div id="script-stream"></div>
+    </section>
+
+    <!-- Right Monitor & Quick Navigation -->
+    <aside id="monitor-sidebar">
+      <div class="monitor-card">
+        <div class="monitor-label">
+          <span>NO AR AGORA NO MEET</span>
+          <span id="mon-counter">SLIDE 01 / 21</span>
+        </div>
+        <div class="monitor-img-wrap">
+          <img id="mon-curr-img" src="" alt="Slide Atual" />
+        </div>
+        <div class="nav-buttons-big">
+          <button class="nav-btn-big" id="mon-prev">◀ Anterior (←)</button>
+          <button class="nav-btn-big next" id="mon-next">Próximo (→) ▶</button>
+        </div>
+      </div>
+
+      <div class="monitor-card">
+        <div class="monitor-label">
+          <span>PRÓXIMO SLIDE NA FILA</span>
+          <span id="mon-next-num" style="color:var(--muted);">02 / 21</span>
+        </div>
+        <div class="monitor-img-wrap" style="border-color:var(--line);opacity:0.75;margin-bottom:0;">
+          <img id="mon-next-img" src="" alt="Próximo Slide" />
+        </div>
+      </div>
+
+      <div class="monitor-card" style="flex:1;display:flex;flex-direction:column;">
+        <div class="monitor-label">
+          <span>ÍNDICE RÁPIDO (21 SLIDES)</span>
+          <span style="color:var(--muted);font-weight:600;">Clique p/ ir</span>
+        </div>
+        <div class="jump-list" id="jump-list"></div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const SLIDES = [{"num": 1, "act": "ATO I • ABERTURA & CONEXÃO", "title": "Capa: Hackeando a Realidade", "cue": "Boas-vindas calorosas • Pergunta no chat • Alinhamento da promessa", "raw_script": "Sejam muito bem-vindos, pessoal! Boa noite pra todo mundo que já tá chegando aqui na sala. Antes de eu entrar no que eu preparei pra hoje, eu quero sentir quem tá aqui comigo ao vivo neste domingo, dia 15 de novembro.\n\nEntão já manda aqui no chat pra mim **de qual cidade você tá me assistindo agora** e me responde com sinceridade uma coisa: ==você também sentiu nas últimas semanas que o tempo parece que acelerou e que ficou pesado demais tentar decidir e carregar tudo sozinho?== Escreve aqui no chat se você sentiu isso na pele, porque **nada do que você tá sentindo nessas últimas semanas é coisa da sua cabeça**.\n\nEu preparei esse encontro de hoje com muito cuidado, e já quero alinhar o nosso combinado logo nesse primeiro minuto. Se você abriu essa transmissão achando que ia ver uma aula teórica chata pra ficar decorando nome de planeta, ou mais uma daquelas lives superficiais de internet, você vai se surpreender muito nos próximos minutos.\n\nHoje nós vamos olhar pra Astrologia pela lente original dela: ==uma ferramenta prática e humana para entender o que está acontecendo no mundo e na sua própria vida==, para você **parar de decidir no escuro** e saber exatamente o seu próximo passo no trabalho, no dinheiro e nas relações. E sim, exatamente às **19h30 deste dia 15 de novembro**, no ápice do mapa que está no céu hoje, eu vou abrir oficialmente as portas da **Comunidade Astrowake** com a nossa condição única de Black Friday para Embaixadores.", "html_script": "<p>Sejam muito bem-vindos, pessoal! Boa noite pra todo mundo que já tá chegando aqui na sala. Antes de eu entrar no que eu preparei pra hoje, eu quero sentir quem tá aqui comigo ao vivo neste domingo, dia 15 de novembro.</p>\n<p>Então já manda aqui no chat pra mim <strong>de qual cidade você tá me assistindo agora</strong> e me responde com sinceridade uma coisa: <span class=\"hl-amber\">você também sentiu nas últimas semanas que o tempo parece que acelerou e que ficou pesado demais tentar decidir e carregar tudo sozinho?</span> Escreve aqui no chat se você sentiu isso na pele, porque <strong>nada do que você tá sentindo nessas últimas semanas é coisa da sua cabeça</strong>.</p>\n<p>Eu preparei esse encontro de hoje com muito cuidado, e já quero alinhar o nosso combinado logo nesse primeiro minuto. Se você abriu essa transmissão achando que ia ver uma aula teórica chata pra ficar decorando nome de planeta, ou mais uma daquelas lives superficiais de internet, você vai se surpreender muito nos próximos minutos.</p>\n<p>Hoje nós vamos olhar pra Astrologia pela lente original dela: <span class=\"hl-amber\">uma ferramenta prática e humana para entender o que está acontecendo no mundo e na sua própria vida</span>, para você <strong>parar de decidir no escuro</strong> e saber exatamente o seu próximo passo no trabalho, no dinheiro e nas relações. E sim, exatamente às <strong>19h30 deste dia 15 de novembro</strong>, no ápice do mapa que está no céu hoje, eu vou abrir oficialmente as portas da <strong>Comunidade Astrowake</strong> com a nossa condição única de Black Friday para Embaixadores.</p>", "img": "assets/slides/slide_01.jpg"}, {"num": 2, "act": "ATO I • O ANTÍDOTO CONTRA O PÂNICO", "title": "De Onde Nasce o Medo? (As 4 Estações)", "cue": "Contraste entre a ilha tropical (pânico na neve) e o agricultor tomando café em paz", "raw_script": "Então respira fundo, desliga as distrações do celular e presta muita atenção nessa primeira verdade que eu coloquei na tela. Olha ao seu redor ou abre qualquer rede social hoje. A internet inteira parece que entrou em estado de pânico constante. É notícia de guerra, é polarização extrema, é a Inteligência Artificial mudando profissões inteiras da noite pro dia, é crise econômica, é gente boa acordando às três da manhã com o peito apertado sem saber pra onde o mundo tá indo.\n\nMas para e pensa comigo por um segundo: **por que o ser humano sente medo diante disso tudo?** ==O medo só existe quando você caminha no escuro e acha que o mundo está virando de cabeça para baixo por acidente.==\n\nImagina uma pessoa que nasceu numa ilha tropical e **nunca ouviu falar que existem 4 estações no ano**. Um dia ela viaja pro norte, chega o outono, as folhas das árvores começam a secar e cair no chão, o vento gela, a neve cobre a terra inteira e nada mais nasce no campo. O que acontece na cabeça de quem não conhece o ciclo das estações? **Essa pessoa entra em desespero.** Ela acha que a natureza morreu, que o planeta acabou, e paralisa de pavor.\n\nAgora, olha pro **agricultor experiente** que mora do lado dela. Ele olha pra mesma neve caindo lá fora e ==toma o café dele em paz==. Ele não tem medo do inverno porque **ele conhece o relógio das estações**. Ele sabe exatamente quando o frio começa, sabe o que precisa guardar no celeiro, sabe que debaixo daquela terra gelada a próxima safra já está sendo preparada e sabe a semana exata em que a primavera vai voltar. ==Quando você entende astrologicamente o ciclo que o planeta está vivendo e enxerga o seu próprio ciclo dentro dele, o medo deixa de existir. No lugar da angústia, entra direção.==", "html_script": "<p>Então respira fundo, desliga as distrações do celular e presta muita atenção nessa primeira verdade que eu coloquei na tela. Olha ao seu redor ou abre qualquer rede social hoje. A internet inteira parece que entrou em estado de pânico constante. É notícia de guerra, é polarização extrema, é a Inteligência Artificial mudando profissões inteiras da noite pro dia, é crise econômica, é gente boa acordando às três da manhã com o peito apertado sem saber pra onde o mundo tá indo.</p>\n<p>Mas para e pensa comigo por um segundo: <strong>por que o ser humano sente medo diante disso tudo?</strong> <span class=\"hl-amber\">O medo só existe quando você caminha no escuro e acha que o mundo está virando de cabeça para baixo por acidente.</span></p>\n<p>Imagina uma pessoa que nasceu numa ilha tropical e <strong>nunca ouviu falar que existem 4 estações no ano</strong>. Um dia ela viaja pro norte, chega o outono, as folhas das árvores começam a secar e cair no chão, o vento gela, a neve cobre a terra inteira e nada mais nasce no campo. O que acontece na cabeça de quem não conhece o ciclo das estações? <strong>Essa pessoa entra em desespero.</strong> Ela acha que a natureza morreu, que o planeta acabou, e paralisa de pavor.</p>\n<p>Agora, olha pro <strong>agricultor experiente</strong> que mora do lado dela. Ele olha pra mesma neve caindo lá fora e <span class=\"hl-amber\">toma o café dele em paz</span>. Ele não tem medo do inverno porque <strong>ele conhece o relógio das estações</strong>. Ele sabe exatamente quando o frio começa, sabe o que precisa guardar no celeiro, sabe que debaixo daquela terra gelada a próxima safra já está sendo preparada e sabe a semana exata em que a primavera vai voltar. <span class=\"hl-amber\">Quando você entende astrologicamente o ciclo que o planeta está vivendo e enxerga o seu próprio ciclo dentro dele, o medo deixa de existir. No lugar da angústia, entra direção.</span></p>", "img": "assets/slides/slide_02.jpg"}, {"num": 3, "act": "PILAR 01 • OS GRANDES CICLOS PLANETÁRIOS", "title": "A Troca de Sistema Operacional (Plutão em Aquário)", "cue": "Saída de Plutão de Capricórnio (pirâmides rígidas) para Aquário (redes, IA e grupos lúcidos)", "raw_script": "E o que o relógio do céu está mostrando agora para o nosso planeta? Nós estamos vivendo uma coisa que a humanidade só assiste a cada muitos séculos: **a mudança simultânea dos grandes planetas lentos**, que são os ponteiros que regem civilizações inteiras. O primeiro grande movimento que está na tela é a saída definitiva de ==Plutão do signo de Capricórnio para o signo de Aquário==.\n\nOlha o que isso significa na prática: durante os últimos anos, enquanto Plutão esteve em Capricórnio, todo o poder do mundo estava concentrado nas **grandes estruturas verticais**, nos bancos tradicionais, nos governos engessados, nas carreiras lineares onde você fazia trinta anos a mesma coisa e tinha uma falsa sensação de estabilidade. Quem ainda tenta se agarrar a esse modelo antigo hoje sente que **o chão está rachando debaixo dos pés**.\n\nPorque quando **Plutão pisa em Aquário**, o planeta inteiro troca de sistema operacional. ==O poder sai do topo daquelas velhas pirâmides lentas e migra para a tecnologia, para a Inteligência Artificial, para o conhecimento descentralizado e para a força dos grupos lúcidos.== É exatamente por isso que, em questão de meses, a Inteligência Artificial virou o mercado de trabalho de cabeça para baixo.", "html_script": "<p>E o que o relógio do céu está mostrando agora para o nosso planeta? Nós estamos vivendo uma coisa que a humanidade só assiste a cada muitos séculos: <strong>a mudança simultânea dos grandes planetas lentos</strong>, que são os ponteiros que regem civilizações inteiras. O primeiro grande movimento que está na tela é a saída definitiva de <span class=\"hl-amber\">Plutão do signo de Capricórnio para o signo de Aquário</span>.</p>\n<p>Olha o que isso significa na prática: durante os últimos anos, enquanto Plutão esteve em Capricórnio, todo o poder do mundo estava concentrado nas <strong>grandes estruturas verticais</strong>, nos bancos tradicionais, nos governos engessados, nas carreiras lineares onde você fazia trinta anos a mesma coisa e tinha uma falsa sensação de estabilidade. Quem ainda tenta se agarrar a esse modelo antigo hoje sente que <strong>o chão está rachando debaixo dos pés</strong>.</p>\n<p>Porque quando <strong>Plutão pisa em Aquário</strong>, o planeta inteiro troca de sistema operacional. <span class=\"hl-amber\">O poder sai do topo daquelas velhas pirâmides lentas e migra para a tecnologia, para a Inteligência Artificial, para o conhecimento descentralizado e para a força dos grupos lúcidos.</span> É exatamente por isso que, em questão de meses, a Inteligência Artificial virou o mercado de trabalho de cabeça para baixo.</p>", "img": "assets/slides/slide_03.jpg"}, {"num": 4, "act": "PILAR 01 • A CONVERGÊNCIA DE 2026 E 2027", "title": "Por Que Tudo Acelerou Tanto? (Urano + Saturno/Netuno)", "cue": "Urano em Gêmeos (velocidade) + Saturno/Netuno em Áries + A Grande Transferência", "raw_script": "E repara que Plutão em Aquário não está agindo sozinho. Ao mesmo tempo, nós temos outros dois movimentos colossais acontecendo entre 2026 e 2027: **Urano avançando por Gêmeos**, e **Saturno junto com Netuno caminhando em Áries**.\n\n**Urano** é o raio que revoluciona tudo o que toca, e **Gêmeos** rege a mente, a informação, o comércio e as conexões. Juntar Urano em Gêmeos com Plutão em Aquário significa que ==transformações que no século passado demoravam 30 anos para acontecer agora acontecem em poucos meses==. Enquanto isso, **Saturno e Netuno em Áries** explicam o choque de fronteiras lá fora: as tensões geopolíticas, as guerras de narrativa, a polarização extrema nas redes sociais e o desmoronamento de todas as ilusões e falsas seguranças.\n\nAgora presta atenção no terceiro cartão desta tela: **quem olha para esse cenário sem a lente da Astrologia paralisa pelo medo.** A pessoa trava o próprio dinheiro no banco perdendo poder de compra, aceita continuar num trabalho que drena a alma dela por pavor do amanhã e leva toda essa tensão para dentro do casamento. Já quem compreende o ciclo enxerga o que a história humana já provou dezenas de vezes: ==toda grande transição de era é a maior janela de transferência de prosperidade para quem tem clareza para se posicionar antes da multidão.== Coloca aqui no chat se essa visão já muda a forma como você olha para o momento atual.", "html_script": "<p>E repara que Plutão em Aquário não está agindo sozinho. Ao mesmo tempo, nós temos outros dois movimentos colossais acontecendo entre 2026 e 2027: <strong>Urano avançando por Gêmeos</strong>, e <strong>Saturno junto com Netuno caminhando em Áries</strong>.</p>\n<p><strong>Urano</strong> é o raio que revoluciona tudo o que toca, e <strong>Gêmeos</strong> rege a mente, a informação, o comércio e as conexões. Juntar Urano em Gêmeos com Plutão em Aquário significa que <span class=\"hl-amber\">transformações que no século passado demoravam 30 anos para acontecer agora acontecem em poucos meses</span>. Enquanto isso, <strong>Saturno e Netuno em Áries</strong> explicam o choque de fronteiras lá fora: as tensões geopolíticas, as guerras de narrativa, a polarização extrema nas redes sociais e o desmoronamento de todas as ilusões e falsas seguranças.</p>\n<p>Agora presta atenção no terceiro cartão desta tela: <strong>quem olha para esse cenário sem a lente da Astrologia paralisa pelo medo.</strong> A pessoa trava o próprio dinheiro no banco perdendo poder de compra, aceita continuar num trabalho que drena a alma dela por pavor do amanhã e leva toda essa tensão para dentro do casamento. Já quem compreende o ciclo enxerga o que a história humana já provou dezenas de vezes: <span class=\"hl-amber\">toda grande transição de era é a maior janela de transferência de prosperidade para quem tem clareza para se posicionar antes da multidão.</span> Coloca aqui no chat se essa visão já muda a forma como você olha para o momento atual.</p>", "img": "assets/slides/slide_04.jpg"}, {"num": 5, "act": "PROVA HISTÓRICA • BOLONHA, PÁDUA E SALAMANCA", "title": "Da Universidade à 'Piadinha' de 1930", "cue": "Medicina + Matemática até o Séc. XVII • Galileu em Pádua (1592) • Sabotagem dos jornais em 1930", "raw_script": "Diante disso, surge uma pergunta inevitável: se a Astrologia é essa ferramenta tão precisa para ler o tempo do mundo e o nosso próprio tempo, **por que a maioria das pessoas inteligentes hoje tenta atravessar a vida às cegas?** Pouca gente conhece os fatos históricos que eu coloquei nessa lâmina.\n\nAté o **século XVII**, nas maiores e mais respeitadas universidades da Europa, como **Bolonha, Pádua e Salamanca**, a Astrologia era disciplina obrigatória ao lado da **Medicina e da Matemática**. Um médico formado naquelas universidades era proibido de realizar uma cirurgia importante sem antes calcular o Mapa e os trânsitos do paciente, porque eles sabiam que intervir no corpo humano no ciclo errado colocava a vida da pessoa em risco. Em **1592, na Universidade de Pádua**, o próprio ==Galileu Galilei dava aulas ensinando médicos, nobres e estrategistas a calcular mapas astrológicos== antes de qualquer decisão crítica.\n\nMas pensa comigo: se você quer afastar pessoas capazes e inteligentes de uma ferramenta que dá autonomia sobre a própria vida, você não precisa queimar bibliotecas nem proibir nada por decreto. **Basta transformar aquilo em motivo de chacota.** Em **1930**, jornais ingleses pegaram uma sabedoria milenar que cruza dezenas de variáveis exatas do seu nascimento e ==encolheram tudo em 12 frases genéricas de rodapé de jornal==. O efeito foi certeiro: pessoas sérias, médicos, empresários, terapeutas e profissionais brilhantes passaram a ter vergonha de olhar para a própria bússola.", "html_script": "<p>Diante disso, surge uma pergunta inevitável: se a Astrologia é essa ferramenta tão precisa para ler o tempo do mundo e o nosso próprio tempo, <strong>por que a maioria das pessoas inteligentes hoje tenta atravessar a vida às cegas?</strong> Pouca gente conhece os fatos históricos que eu coloquei nessa lâmina.</p>\n<p>Até o <strong>século XVII</strong>, nas maiores e mais respeitadas universidades da Europa, como <strong>Bolonha, Pádua e Salamanca</strong>, a Astrologia era disciplina obrigatória ao lado da <strong>Medicina e da Matemática</strong>. Um médico formado naquelas universidades era proibido de realizar uma cirurgia importante sem antes calcular o Mapa e os trânsitos do paciente, porque eles sabiam que intervir no corpo humano no ciclo errado colocava a vida da pessoa em risco. Em <strong>1592, na Universidade de Pádua</strong>, o próprio <span class=\"hl-amber\">Galileu Galilei dava aulas ensinando médicos, nobres e estrategistas a calcular mapas astrológicos</span> antes de qualquer decisão crítica.</p>\n<p>Mas pensa comigo: se você quer afastar pessoas capazes e inteligentes de uma ferramenta que dá autonomia sobre a própria vida, você não precisa queimar bibliotecas nem proibir nada por decreto. <strong>Basta transformar aquilo em motivo de chacota.</strong> Em <strong>1930</strong>, jornais ingleses pegaram uma sabedoria milenar que cruza dezenas de variáveis exatas do seu nascimento e <span class=\"hl-amber\">encolheram tudo em 12 frases genéricas de rodapé de jornal</span>. O efeito foi certeiro: pessoas sérias, médicos, empresários, terapeutas e profissionais brilhantes passaram a ter vergonha de olhar para a própria bússola.</p>", "img": "assets/slides/slide_05.jpg"}, {"num": 6, "act": "ETIMOLOGIA & NAVEGAÇÃO DO TEMPO", "title": "O Significado de 'Des-Astre'", "cue": "DES (desconectar) + ASTRE (estrelas) • A semente mais cara do mundo jogada na geada", "raw_script": "E qual é a conta que você paga na sua rotina quando abre mão dessa bússola? Olha para a palavra que está destacada na tela: **Desastre**. Quando um projeto que você deu a vida morre na praia, quando uma sociedade quebra ou um relacionamento desmorona, a gente costuma chamar aquilo de desastre, achando que foi azar ou que faltou se esforçar mais.\n\nSó que repara no que a própria língua portuguesa está dizendo na nossa cara: o prefixo **\"Des\"** indica desconexão, igual em desorientar ou desalinhar. E **\"Astre\"** vem literalmente de astro, as estrelas, o céu. ==Na origem da palavra, Desastre significa literalmente agir desalinhado do céu.==\n\nAntigamente, quem cruzava os oceanos se guiava pelas estrelas. Quando o tempo fechava e o navegador perdia os astros de vista, se ele teimasse em acelerar o barco no escuro, **ele batia direto nas pedras**. É exatamente isso que acontece quando você tenta decidir sua carreira, seus investimentos e suas conversas definitivas olhando apenas para a folhinha de papel na parede, achando que toda segunda-feira é igual.\n\nOlha pro quadro da direita: a cultura moderna te vendeu a mentira de que basta trabalhar 14 horas por dia e fazer força bruta que tudo dá certo. ==Experimenta pegar a semente mais cara e fértil do mundo e jogar na terra no meio de uma geada de inverno.== Não importa o quanto você regue, trabalhe ou reze: **a planta morre porque a estação estava errada.** Força de vontade no ciclo errado só serve para acelerar o seu esgotamento. Quem aqui já viveu na pele a sensação de estar dando o sangue mas remando contra a maré? **Digita EU JÁ aqui no chat.**", "html_script": "<p>E qual é a conta que você paga na sua rotina quando abre mão dessa bússola? Olha para a palavra que está destacada na tela: <strong>Desastre</strong>. Quando um projeto que você deu a vida morre na praia, quando uma sociedade quebra ou um relacionamento desmorona, a gente costuma chamar aquilo de desastre, achando que foi azar ou que faltou se esforçar mais.</p>\n<p>Só que repara no que a própria língua portuguesa está dizendo na nossa cara: o prefixo <strong>\"Des\"</strong> indica desconexão, igual em desorientar ou desalinhar. E <strong>\"Astre\"</strong> vem literalmente de astro, as estrelas, o céu. <span class=\"hl-amber\">Na origem da palavra, Desastre significa literalmente agir desalinhado do céu.</span></p>\n<p>Antigamente, quem cruzava os oceanos se guiava pelas estrelas. Quando o tempo fechava e o navegador perdia os astros de vista, se ele teimasse em acelerar o barco no escuro, <strong>ele batia direto nas pedras</strong>. É exatamente isso que acontece quando você tenta decidir sua carreira, seus investimentos e suas conversas definitivas olhando apenas para a folhinha de papel na parede, achando que toda segunda-feira é igual.</p>\n<p>Olha pro quadro da direita: a cultura moderna te vendeu a mentira de que basta trabalhar 14 horas por dia e fazer força bruta que tudo dá certo. <span class=\"hl-amber\">Experimenta pegar a semente mais cara e fértil do mundo e jogar na terra no meio de uma geada de inverno.</span> Não importa o quanto você regue, trabalhe ou reze: <strong>a planta morre porque a estação estava errada.</strong> Força de vontade no ciclo errado só serve para acelerar o seu esgotamento. Quem aqui já viveu na pele a sensação de estar dando o sangue mas remando contra a maré? <strong>Digita EU JÁ aqui no chat.</strong></p>", "img": "assets/slides/slide_06.jpg"}, {"num": 7, "act": "PILAR 02 • O EIXO DA EVOLUÇÃO HUMANA", "title": "A Virada dos Nodos Lunares (Leão → Aquário)", "cue": "Nodo Sul em Leão (fim do lobo solitário) → Nodo Norte em Aquário (força do clã consciente)", "raw_script": "E agora olha para um dos movimentos mais profundos do céu atual, que mostra **por que tentar resolver a vida sozinho ficou insuportável neste fim de ano**: a virada do eixo dos **Nodos Lunares**. Na Astrologia, o **Nodo Sul** aponta o comportamento antigo que está perdendo força, e o **Nodo Norte** mostra exatamente para onde a evolução está puxando a humanidade.\n\nNeste momento, o eixo está virando de **Leão para Aquário**. O **Nodo Sul em Leão** está desligando a tomada daquele modelo antigo do ==lobo solitário==: a pessoa centrada no próprio orgulho, que acha que precisa carregar o mundo nas costas sozinha, trancada no quarto escuro, mantendo a pose de que está tudo bem enquanto por dentro está no limite.\n\nE para onde o **Nodo Norte em Aquário** está empurrando a prosperidade, a proteção e o crescimento real pelos próximos anos? ==Para a força do coletivo. Para as alianças horizontais, para a inteligência compartilhada e para o pertencimento a um clã consciente.== Se você tentar atravessar 2027 isolado, cercado apenas de conversas rasas no trabalho ou na família, você vai gastar o dobro de energia para chegar na metade do caminho. **Caminhar junto com uma tribo lúcida que fala a mesma língua deixou de ser luxo: é a própria direção do relógio do céu.**", "html_script": "<p>E agora olha para um dos movimentos mais profundos do céu atual, que mostra <strong>por que tentar resolver a vida sozinho ficou insuportável neste fim de ano</strong>: a virada do eixo dos <strong>Nodos Lunares</strong>. Na Astrologia, o <strong>Nodo Sul</strong> aponta o comportamento antigo que está perdendo força, e o <strong>Nodo Norte</strong> mostra exatamente para onde a evolução está puxando a humanidade.</p>\n<p>Neste momento, o eixo está virando de <strong>Leão para Aquário</strong>. O <strong>Nodo Sul em Leão</strong> está desligando a tomada daquele modelo antigo do <span class=\"hl-amber\">lobo solitário</span>: a pessoa centrada no próprio orgulho, que acha que precisa carregar o mundo nas costas sozinha, trancada no quarto escuro, mantendo a pose de que está tudo bem enquanto por dentro está no limite.</p>\n<p>E para onde o <strong>Nodo Norte em Aquário</strong> está empurrando a prosperidade, a proteção e o crescimento real pelos próximos anos? <span class=\"hl-amber\">Para a força do coletivo. Para as alianças horizontais, para a inteligência compartilhada e para o pertencimento a um clã consciente.</span> Se você tentar atravessar 2027 isolado, cercado apenas de conversas rasas no trabalho ou na família, você vai gastar o dobro de energia para chegar na metade do caminho. <strong>Caminhar junto com uma tribo lúcida que fala a mesma língua deixou de ser luxo: é a própria direção do relógio do céu.</strong></p>", "img": "assets/slides/slide_07.jpg"}, {"num": 8, "act": "PILAR 03 • A VERDADE NUA DE NOVEMBRO", "title": "A Força do Sol em Escorpião", "cue": "Fim do pânico e da positividade tóxica • Casa 8 (estancar vazamento de dinheiro) • Casa 7 (relações)", "raw_script": "E junto com esse chamado coletivo de Aquário, repara em qual signo o Sol está brilhando exatamente hoje, neste dia 15 de novembro: **Escorpião**. Esquece os clichês rasos de internet sobre Escorpião. Na Astrologia séria, Escorpião é o signo que **olha a verdade de frente** para cortar o que já perdeu a vida e liberar a verdadeira regeneração.\n\nOlha para os três cartões na tela:\n\n**Primeiro:** o mundo lá fora tenta te prender entre dois extremos doentes. De um lado, o **pânico paralisante**; do outro, aquela **“positividade tóxica”** infantil de achar que basta repetir frases bonitas na frente do espelho que os boletos se pagam sozinhos. ==O Sol em Escorpião corta essas duas ilusões e traz maturidade adulta para resolver a raiz real das coisas.==\n\n**Segundo:** na sua prosperidade e na sua **Casa 8**, ele mostra exatamente o ponto cego onde você está **vazando energia e dinheiro** por medo de encerrar acordos, hábitos ou ciclos profissionais que já morreram.\n\n**E terceiro:** nos seus relacionamentos, ele mostra por que tanta gente inteligente repete sempre o mesmo padrão afetivo desgastante. Quando você enxerga como funcionam a sua **Lua, a sua Vênus, a sua Lilith e a sua Casa 7**, você para de culpar o azar ou o “dedo podre” e passa a construir relações de parceria real.", "html_script": "<p>E junto com esse chamado coletivo de Aquário, repara em qual signo o Sol está brilhando exatamente hoje, neste dia 15 de novembro: <strong>Escorpião</strong>. Esquece os clichês rasos de internet sobre Escorpião. Na Astrologia séria, Escorpião é o signo que <strong>olha a verdade de frente</strong> para cortar o que já perdeu a vida e liberar a verdadeira regeneração.</p>\n<p>Olha para os três cartões na tela:</p>\n<p><strong>Primeiro:</strong> o mundo lá fora tenta te prender entre dois extremos doentes. De um lado, o <strong>pânico paralisante</strong>; do outro, aquela <strong>“positividade tóxica”</strong> infantil de achar que basta repetir frases bonitas na frente do espelho que os boletos se pagam sozinhos. <span class=\"hl-amber\">O Sol em Escorpião corta essas duas ilusões e traz maturidade adulta para resolver a raiz real das coisas.</span></p>\n<p><strong>Segundo:</strong> na sua prosperidade e na sua <strong>Casa 8</strong>, ele mostra exatamente o ponto cego onde você está <strong>vazando energia e dinheiro</strong> por medo de encerrar acordos, hábitos ou ciclos profissionais que já morreram.</p>\n<p><strong>E terceiro:</strong> nos seus relacionamentos, ele mostra por que tanta gente inteligente repete sempre o mesmo padrão afetivo desgastante. Quando você enxerga como funcionam a sua <strong>Lua, a sua Vênus, a sua Lilith e a sua Casa 7</strong>, você para de culpar o azar ou o “dedo podre” e passa a construir relações de parceria real.</p>", "img": "assets/slides/slide_08.jpg"}, {"num": 9, "act": "PILAR 04 • A VIRADA DE CHAVE PESSOAL", "title": "De Chinelo e Camiseta na Sala de Casa", "cue": "História real do Crassus: largando o terno para atender na mesa da sala na língua da Dona Neusa", "raw_script": "E talvez você esteja se perguntando agora: *\"Crassus, mas será que eu consigo aplicar uma leitura profunda assim na minha rotina sem precisar estudar cinco anos em livros difíceis?\"*. Deixa eu te contar rapidamente como essa chave virou na minha própria vida.\n\nAntes de dedicar a minha vida à Astrologia, eu era empresário do mundo tradicional. Eu tinha negócios, andava de terno e gravata e ganhava dinheiro, mas sentia todos os dias um vazio silencioso, como se eu estivesse **vivendo fora do meu próprio eixo**.\n\nEu já estudava Astrologia a fundo, até que ==num sábado de manhã, antes de tomar qualquer decisão drástica de vender minhas empresas, eu limpei a mesa da sala da minha casa, coloquei duas cadeiras simples, dobrei o terno no armário e sentei ali de chinelo e camiseta para atender a minha primeira cliente==.\n\nNaquela manhã, sentado de chinelo e camiseta na sala de casa, caiu a maior ficha da minha vida: **quando você tira todo aquele misticismo confuso da frente e traduz o Mapa na língua da vida real**, de um jeito tão claro, lógico e humano que até a **Dona Neusa** entende e aplica na segunda-feira, ==um único encontro destrava em uma hora o que anos de tentativa e erro não conseguiram resolver==. Em um ano, eu vendi todas as minhas empresas tradicionais porque descobri que nada no mundo tem o poder de transformação prática dessa ferramenta quando ela é ensinada do jeito certo.", "html_script": "<p>E talvez você esteja se perguntando agora: <em>\"Crassus, mas será que eu consigo aplicar uma leitura profunda assim na minha rotina sem precisar estudar cinco anos em livros difíceis?\"</em>. Deixa eu te contar rapidamente como essa chave virou na minha própria vida.</p>\n<p>Antes de dedicar a minha vida à Astrologia, eu era empresário do mundo tradicional. Eu tinha negócios, andava de terno e gravata e ganhava dinheiro, mas sentia todos os dias um vazio silencioso, como se eu estivesse <strong>vivendo fora do meu próprio eixo</strong>.</p>\n<p>Eu já estudava Astrologia a fundo, até que <span class=\"hl-amber\">num sábado de manhã, antes de tomar qualquer decisão drástica de vender minhas empresas, eu limpei a mesa da sala da minha casa, coloquei duas cadeiras simples, dobrei o terno no armário e sentei ali de chinelo e camiseta para atender a minha primeira cliente</span>.</p>\n<p>Naquela manhã, sentado de chinelo e camiseta na sala de casa, caiu a maior ficha da minha vida: <strong>quando você tira todo aquele misticismo confuso da frente e traduz o Mapa na língua da vida real</strong>, de um jeito tão claro, lógico e humano que até a <strong>Dona Neusa</strong> entende e aplica na segunda-feira, <span class=\"hl-amber\">um único encontro destrava em uma hora o que anos de tentativa e erro não conseguiram resolver</span>. Em um ano, eu vendi todas as minhas empresas tradicionais porque descobri que nada no mundo tem o poder de transformação prática dessa ferramenta quando ela é ensinada do jeito certo.</p>", "img": "assets/slides/slide_09.jpg"}, {"num": 10, "act": "PILAR 04 • O MÉTODO PRÁTICO SEM DECOREBA", "title": "As 3 Engrenagens da Vida Real", "cue": "01. Planetas (O Quê?) • 02. Signos (Como?) • 03. Casas + Trânsitos (Onde e Quando?)", "raw_script": "E olha na tela como essa tradução funciona na prática através das **3 engrenagens vivas** do seu Mapa e do seu tempo, sem decoreba chata:\n\n**A primeira engrenagem são os Planetas (O Quê?):** são os personagens que operam no seu comando interno. O **Sol** é a sua essência e direção central; a **Lua** mostra do que você precisa para ter segurança emocional; **Mercúrio** é a forma como você pensa, fala e negocia; **Vênus** mostra o que te move no amor e no dinheiro; **Marte** é a sua coragem de execução; **Júpiter e Saturno** mostram onde você expande e onde a vida cobra estrutura.\n\n**A segunda engrenagem são os Signos (Como?):** mostram **de que jeito** cada planeta trabalha dentro de você, revelando seus talentos naturais e como parar de brigar contra a sua própria natureza.\n\n**E a terceira engrenagem são as Casas + Trânsitos (Onde e Quando?):** é a meteorologia das suas decisões. ==Quando Saturno pressiona a sua Casa 2, a ordem é enxugar estrutura e proteger o caixa. Quando Urano ativa a sua rota, é hora de cortar o que estagnou. E quando Júpiter abre o caminho, é hora de avançar com tudo.==\n\nMe conta aqui no chat agora: **qual área da sua vida hoje mais precisa dessa clareza de tempo certo: PROSPERIDADE, CARREIRA ou RELACIONAMENTOS?**", "html_script": "<p>E olha na tela como essa tradução funciona na prática através das <strong>3 engrenagens vivas</strong> do seu Mapa e do seu tempo, sem decoreba chata:</p>\n<p><strong>A primeira engrenagem são os Planetas (O Quê?):</strong> são os personagens que operam no seu comando interno. O <strong>Sol</strong> é a sua essência e direção central; a <strong>Lua</strong> mostra do que você precisa para ter segurança emocional; <strong>Mercúrio</strong> é a forma como você pensa, fala e negocia; <strong>Vênus</strong> mostra o que te move no amor e no dinheiro; <strong>Marte</strong> é a sua coragem de execução; <strong>Júpiter e Saturno</strong> mostram onde você expande e onde a vida cobra estrutura.</p>\n<p><strong>A segunda engrenagem são os Signos (Como?):</strong> mostram <strong>de que jeito</strong> cada planeta trabalha dentro de você, revelando seus talentos naturais e como parar de brigar contra a sua própria natureza.</p>\n<p><strong>E a terceira engrenagem são as Casas + Trânsitos (Onde e Quando?):</strong> é a meteorologia das suas decisões. <span class=\"hl-amber\">Quando Saturno pressiona a sua Casa 2, a ordem é enxugar estrutura e proteger o caixa. Quando Urano ativa a sua rota, é hora de cortar o que estagnou. E quando Júpiter abre o caminho, é hora de avançar com tudo.</span></p>\n<p>Me conta aqui no chat agora: <strong>qual área da sua vida hoje mais precisa dessa clareza de tempo certo: PROSPERIDADE, CARREIRA ou RELACIONAMENTOS?</strong></p>", "img": "assets/slides/slide_10.jpg"}, {"num": 11, "act": "ATO III • ASTROLOGIA ELECIONAL NA PRÁTICA", "title": "Nada Nesta Data Foi Escolhido Por Acaso", "cue": "A revelação da call do início de novembro: por que escolheu o dia 15 entre 18h e 19h30", "raw_script": "Tô vendo vocês responderem aqui no chat: Prosperidade, Carreira, Relacionamentos, as três áreas juntas... E agora eu quero revelar para vocês **um bastidor deste encontro** que arrepia qualquer pessoa que compreende o poder real da Astrologia.\n\nOlha pro relógio agora. Nós estamos entrando exatamente na janela das **19h30 deste domingo, dia 15 de novembro**. Vocês acham mesmo que eu marquei este encontro para o dia 15 de novembro e escolhi abrir a nossa comunidade exatamente neste horário só porque domingo à noite é um dia tranquilo na agenda?\n\n**De jeito nenhum.** Lembra que eu mostrei agora há pouco que os antigos estrategistas, médicos e sábios nunca iniciavam uma grande obra sem antes **abrir o mapa do céu para escolher o minuto exato do nascimento** daquela criação?\n\n==No início deste mês, eu sentei com o mapa de novembro inteiro aberto na tela para escolher o momento exato de fazer nascer o projeto mais importante da minha vida.== E quando eu coloquei na tela o mapa de **hoje, domingo, dia 15 de novembro, na janela entre as 18h e as 19h30**, eu falei na hora: ==“Cara, esse é o mapa do negócio. Não dá para ignorar isso aqui. Tem que nascer exatamente neste minuto.”==", "html_script": "<p>Tô vendo vocês responderem aqui no chat: Prosperidade, Carreira, Relacionamentos, as três áreas juntas... E agora eu quero revelar para vocês <strong>um bastidor deste encontro</strong> que arrepia qualquer pessoa que compreende o poder real da Astrologia.</p>\n<p>Olha pro relógio agora. Nós estamos entrando exatamente na janela das <strong>19h30 deste domingo, dia 15 de novembro</strong>. Vocês acham mesmo que eu marquei este encontro para o dia 15 de novembro e escolhi abrir a nossa comunidade exatamente neste horário só porque domingo à noite é um dia tranquilo na agenda?</p>\n<p><strong>De jeito nenhum.</strong> Lembra que eu mostrei agora há pouco que os antigos estrategistas, médicos e sábios nunca iniciavam uma grande obra sem antes <strong>abrir o mapa do céu para escolher o minuto exato do nascimento</strong> daquela criação?</p>\n<p><span class=\"hl-amber\">No início deste mês, eu sentei com o mapa de novembro inteiro aberto na tela para escolher o momento exato de fazer nascer o projeto mais importante da minha vida.</span> E quando eu coloquei na tela o mapa de <strong>hoje, domingo, dia 15 de novembro, na janela entre as 18h e as 19h30</strong>, eu falei na hora: <span class=\"hl-amber\">“Cara, esse é o mapa do negócio. Não dá para ignorar isso aqui. Tem que nascer exatamente neste minuto.”</span></p>", "img": "assets/slides/slide_11.jpg"}, {"num": 12, "act": "ATO III • O MAPA DO NASCIMENTO OFICIAL (15/11 ÀS 19H30)", "title": "A Egrégora do Despertar (19h30)", "cue": "Ascendente em Gêmeos + Urano • Trígono com Lua e Plutão em Aquário (Casa 9) • Casas 3 e 9 + MC em Peixes", "raw_script": "Olha para o desenho do mapa que está na sua tela agora, porque **esse é literalmente o céu que está aberto sobre as nossas cabeças neste exato minuto, às 19h30 do dia 15 de novembro**:\n\n**Primeiro:** nós temos o ==Ascendente em Gêmeos com o planeta Urano cravado em cima do Ascendente==. Urano é o despertador da consciência, é a comunicação viva e a visão que enxerga anos na frente, quebrando padrões antigos na hora.\n\n**Segundo:** esse Urano no Ascendente está fazendo um ==trígono exato de ar com a Lua e Plutão em Aquário, lá na Casa 9==. Quando eu bati o olho nessa configuração, eu vi na hora qual é o cimento emocional que vai unir as pessoas que estão entrando hoje: **é o pertencimento verdadeiro ao clã**. É a proteção do grupo. É uma coletividade de despertar, onde pessoas inteligentes e despertas caminham juntas.\n\n**E terceiro:** nós temos as **Casas 3 e 9 totalmente ativadas**, com o **Sol em Escorpião na Casa 6** e o **Meio do Céu em Peixes**. A **Casa 9** entrega respostas profundas que tiram o medo. A **Casa 3** com Ascendente em Gêmeos garante que dentro dessa comunidade ==ninguém vai passar despercebido==: todo mundo troca, interage e cresce junto. E **Peixes no Meio do Céu** consagra esse movimento a um propósito humano e espiritual muito maior.", "html_script": "<p>Olha para o desenho do mapa que está na sua tela agora, porque <strong>esse é literalmente o céu que está aberto sobre as nossas cabeças neste exato minuto, às 19h30 do dia 15 de novembro</strong>:</p>\n<p><strong>Primeiro:</strong> nós temos o <span class=\"hl-amber\">Ascendente em Gêmeos com o planeta Urano cravado em cima do Ascendente</span>. Urano é o despertador da consciência, é a comunicação viva e a visão que enxerga anos na frente, quebrando padrões antigos na hora.</p>\n<p><strong>Segundo:</strong> esse Urano no Ascendente está fazendo um <span class=\"hl-amber\">trígono exato de ar com a Lua e Plutão em Aquário, lá na Casa 9</span>. Quando eu bati o olho nessa configuração, eu vi na hora qual é o cimento emocional que vai unir as pessoas que estão entrando hoje: <strong>é o pertencimento verdadeiro ao clã</strong>. É a proteção do grupo. É uma coletividade de despertar, onde pessoas inteligentes e despertas caminham juntas.</p>\n<p><strong>E terceiro:</strong> nós temos as <strong>Casas 3 e 9 totalmente ativadas</strong>, com o <strong>Sol em Escorpião na Casa 6</strong> e o <strong>Meio do Céu em Peixes</strong>. A <strong>Casa 9</strong> entrega respostas profundas que tiram o medo. A <strong>Casa 3</strong> com Ascendente em Gêmeos garante que dentro dessa comunidade <span class=\"hl-amber\">ninguém vai passar despercebido</span>: todo mundo troca, interage e cresce junto. E <strong>Peixes no Meio do Céu</strong> consagra esse movimento a um propósito humano e espiritual muito maior.</p>", "img": "assets/slides/slide_12.jpg"}, {"num": 13, "act": "ATO IV • PORTAS ABERTAS OFICIALMENTE", "title": "Comunidade Astrowake (A Solidão de Quem Desperta)", "cue": "Declaração de nascimento da Comunidade • A dor silenciosa de se sentir um estranho no ninho", "raw_script": "É debaixo deste mapa exato da **Egrégora do Despertar** que eu declaro oficialmente nascida e de portas abertas a ==Comunidade Astrowake==.\n\nE deixa eu te falar uma coisa olho no olho, que está escrita nessa lâmina e que provavelmente você já sente na pele há muito tempo, mas quase ninguém tem coragem de admitir em voz alta: ==começar a enxergar a vida com mais profundidade dá uma sensação absurda de solidão==.\n\nQuando você sai do piloto automático e começa a questionar o porquê das coisas, parece que você vira um **estranho no próprio ninho**. As conversas nas rodas de amigos ficam rasas. O ambiente de trabalho parece um teatro onde todo mundo finge o tempo inteiro. Até dentro da família fica difícil explicar o que você pensa sem ser julgado.", "html_script": "<p>É debaixo deste mapa exato da <strong>Egrégora do Despertar</strong> que eu declaro oficialmente nascida e de portas abertas a <span class=\"hl-amber\">Comunidade Astrowake</span>.</p>\n<p>E deixa eu te falar uma coisa olho no olho, que está escrita nessa lâmina e que provavelmente você já sente na pele há muito tempo, mas quase ninguém tem coragem de admitir em voz alta: <span class=\"hl-amber\">começar a enxergar a vida com mais profundidade dá uma sensação absurda de solidão</span>.</p>\n<p>Quando você sai do piloto automático e começa a questionar o porquê das coisas, parece que você vira um <strong>estranho no próprio ninho</strong>. As conversas nas rodas de amigos ficam rasas. O ambiente de trabalho parece um teatro onde todo mundo finge o tempo inteiro. Até dentro da família fica difícil explicar o que você pensa sem ser julgado.</p>", "img": "assets/slides/slide_13.jpg"}, {"num": 14, "act": "ATO IV • A FORÇA DO AMBIENTE CERTO", "title": "A Regra da Evolução & O Seu Lugar", "cue": "Por que ninguém sustenta a evolução sozinho • A Comunidade como ambiente seguro de gente lúcida", "raw_script": "E aqui existe uma lei da natureza humana que define quem sustenta o próprio crescimento e quem desiste no meio do caminho:\n\n==Ninguém consegue sustentar a própria evolução caminhando sozinho no meio de pessoas que só puxam você de volta para o automático. Mais cedo ou mais tarde, o cansaço bate e o mundo te engole.==\n\nVocê não precisa continuar se diminuindo para caber em lugares que já ficaram pequenos para a sua consciência. **Foi exatamente por isso que eu decidi erguer a Comunidade Astrowake.**\n\nUm ambiente vivo onde você finalmente encontra a sua turma: ==gente lúcida, inteligente e com os pés no chão==, que olha para a vida, os negócios e as relações na mesma frequência que você.", "html_script": "<p>E aqui existe uma lei da natureza humana que define quem sustenta o próprio crescimento e quem desiste no meio do caminho:</p>\n<p><span class=\"hl-amber\">Ninguém consegue sustentar a própria evolução caminhando sozinho no meio de pessoas que só puxam você de volta para o automático. Mais cedo ou mais tarde, o cansaço bate e o mundo te engole.</span></p>\n<p>Você não precisa continuar se diminuindo para caber em lugares que já ficaram pequenos para a sua consciência. <strong>Foi exatamente por isso que eu decidi erguer a Comunidade Astrowake.</strong></p>\n<p>Um ambiente vivo onde você finalmente encontra a sua turma: <span class=\"hl-amber\">gente lúcida, inteligente e com os pés no chão</span>, que olha para a vida, os negócios e as relações na mesma frequência que você.</p>", "img": "assets/slides/slide_14.jpg"}, {"num": 15, "act": "ATO IV • ASTROLOGIA PRÁTICA NA VIDA REAL", "title": "O Fim do 'Modo Difícil' (Lá Fora vs. Aqui Dentro)", "cue": "Contraste entre quem bate cabeça no Modo Difícil lá fora vs. os 5.000 anos de observação prática aqui dentro", "raw_script": "Porque o que une as pessoas dentro da Comunidade Astrowake não é misticismo de palco, e sim uma **leitura prática e humana da realidade** que decreta o fim do **“Modo Difícil”**.\n\nOlha pro quadro da esquerda na tela: a maioria das pessoas lá fora joga a vida inteira no Modo Difícil:\n• Toma decisões de **carreira e dinheiro no escuro**, na base da tentativa e erro;\n• Entra e sai de **relacionamentos repetindo exatamente o mesmo padrão** de desgaste;\n• **Briga contra o próprio tempo**: tenta acelerar quando a vida pede cautela, e trava com medo justo quando a janela de oportunidade está escancarada.\n\nAgora olha pro quadro claro da direita: ==aqui dentro, nós usamos a Astrologia de forma séria, limpa e aplicável==, baseada em 5.000 anos de observação prática do comportamento humano e dos ciclos do tempo, sem tabelas confusas e sem misticismo vazio. Você bate o olho na estrutura de um sócio, cliente, cônjuge ou filho e **entende imediatamente como aquela pessoa funciona**, sabendo **quando avançar, quando proteger o caixa e quando encerrar o que estagnou** com meses de antecedência.", "html_script": "<p>Porque o que une as pessoas dentro da Comunidade Astrowake não é misticismo de palco, e sim uma <strong>leitura prática e humana da realidade</strong> que decreta o fim do <strong>“Modo Difícil”</strong>.</p>\n<p>Olha pro quadro da esquerda na tela: a maioria das pessoas lá fora joga a vida inteira no Modo Difícil:<br/>• Toma decisões de <strong>carreira e dinheiro no escuro</strong>, na base da tentativa e erro;<br/>• Entra e sai de <strong>relacionamentos repetindo exatamente o mesmo padrão</strong> de desgaste;<br/>• <strong>Briga contra o próprio tempo</strong>: tenta acelerar quando a vida pede cautela, e trava com medo justo quando a janela de oportunidade está escancarada.</p>\n<p>Agora olha pro quadro claro da direita: <span class=\"hl-amber\">aqui dentro, nós usamos a Astrologia de forma séria, limpa e aplicável</span>, baseada em 5.000 anos de observação prática do comportamento humano e dos ciclos do tempo, sem tabelas confusas e sem misticismo vazio. Você bate o olho na estrutura de um sócio, cliente, cônjuge ou filho e <strong>entende imediatamente como aquela pessoa funciona</strong>, sabendo <strong>quando avançar, quando proteger o caixa e quando encerrar o que estagnou</strong> com meses de antecedência.</p>", "img": "assets/slides/slide_15.jpg"}, {"num": 16, "act": "ATO IV • OS 3 MOTORES DOS PRÓXIMOS 12 MESES", "title": "Por Que Uma Comunidade Ativa? (Os 3 Motores)", "cue": "01. Pertencimento Real • 02. Aplicativo da Bússola (30s) • 03. 24 Encontros Quinzenais Ao Vivo", "raw_script": "E por que eu construí uma **Comunidade Ativa de 12 meses** em vez de simplesmente vender um curso gravado? Porque a última coisa que você precisa hoje é comprar mais um curso para estudar sozinho num quarto escuro, acumulando aula na gaveta. ==Você precisa de 3 motores vivos funcionando juntos durante 1 ano inteiro:==\n\n**Motor 01 — Pertencimento Real:** Estar cercado diariamente de **empresários, terapeutas, profissionais e pessoas despertas** que falam a mesma língua, trocam experiências reais, fecham parcerias e se apoiam nas mudanças de fase da vida.\n\n**Motor 02 — Velocidade de Decisão no Bolso:** Ter o nosso ==Aplicativo da Bússola na palma da mão==, cruzando o seu Mapa Natal com os trânsitos do dia em **30 segundos**, sem você precisar decorar absolutamente nada.\n\n**Motor 03 — Direcionamento Comigo:** Sentar ==comigo a cada 15 dias ao vivo== para abrirmos mapas, analisarmos casos reais e debatermos a decodificação da realidade usando a Astrologia.", "html_script": "<p>E por que eu construí uma <strong>Comunidade Ativa de 12 meses</strong> em vez de simplesmente vender um curso gravado? Porque a última coisa que você precisa hoje é comprar mais um curso para estudar sozinho num quarto escuro, acumulando aula na gaveta. <span class=\"hl-amber\">Você precisa de 3 motores vivos funcionando juntos durante 1 ano inteiro:</span></p>\n<p><strong>Motor 01 — Pertencimento Real:</strong> Estar cercado diariamente de <strong>empresários, terapeutas, profissionais e pessoas despertas</strong> que falam a mesma língua, trocam experiências reais, fecham parcerias e se apoiam nas mudanças de fase da vida.</p>\n<p><strong>Motor 02 — Velocidade de Decisão no Bolso:</strong> Ter o nosso <span class=\"hl-amber\">Aplicativo da Bússola na palma da mão</span>, cruzando o seu Mapa Natal com os trânsitos do dia em <strong>30 segundos</strong>, sem você precisar decorar absolutamente nada.</p>\n<p><strong>Motor 03 — Direcionamento Comigo:</strong> Sentar <span class=\"hl-amber\">comigo a cada 15 dias ao vivo</span> para abrirmos mapas, analisarmos casos reais e debatermos a decodificação da realidade usando a Astrologia.</p>", "img": "assets/slides/slide_16.jpg"}, {"num": 17, "act": "O PASSAPORTE COMPLETO • PILARES 01 A 03", "title": "Durante 12 Meses Teremos... (Parte 1: Pilares 01, 02 e 03)", "cue": "Apresentar com profundidade os Entregáveis 01 (Comunidade + 24 Encontros), 02 (App da Bússola + IA) e 03 (Formação Completa Astrowake)", "raw_script": "Agora olha na tela, com calma, a grandeza dos **6 entregáveis** que você recebe no seu passaporte de 1 ano inteiro ao entrar na Comunidade Astrowake. Nesta lâmina estão os três primeiros:\n\n**01. A Comunidade Ativa & 24 Encontros Quinzenais Ao Vivo Comigo:** O coração do nosso movimento. A cada 15 dias nós nos reunimos ao vivo para ==abrir juntos mapas, analisar casos reais e debater sobre a decodificação da realidade usando a Astrologia==, destravando questões práticas de negócios, carreira e relacionamentos. Inclui também o nosso **grupo fechado no WhatsApp** para troca diária e escolha dos temas dos encontros.\n\n**02. O Aplicativo da Bússola + Inteligência Diária:** Você já aplica a Astrologia na rotina desde o primeiro dia. Nosso **Aplicativo da Bússola** cruza o seu Mapa Natal com os trânsitos do dia e mostra na tela do celular: **qual área da sua vida está ativada hoje, até que horas dura o efeito** e uma ==Inteligência treinada no meu método== para você consultar decisões práticas na hora (*“devo fechar esse contrato esta semana?”*, *“como conduzir essa conversa difícil hoje?”*).\n\n**03. Formação Completa em Astrologia (Astrowake):** A formação completa para você ter **autonomia total de leitura**. Você domina na prática a estrutura profunda de Planetas, Signos, Casas e Aspectos em aulas diretas ao ponto, sem precisar decorar listas ou tabelas. ==Serve tanto para guiar as decisões da sua própria vida quanto para atuar e atender profissionalmente.==", "html_script": "<p>Agora olha na tela, com calma, a grandeza dos <strong>6 entregáveis</strong> que você recebe no seu passaporte de 1 ano inteiro ao entrar na Comunidade Astrowake. Nesta lâmina estão os três primeiros:</p>\n<p><strong>01. A Comunidade Ativa & 24 Encontros Quinzenais Ao Vivo Comigo:</strong> O coração do nosso movimento. A cada 15 dias nós nos reunimos ao vivo para <span class=\"hl-amber\">abrir juntos mapas, analisar casos reais e debater sobre a decodificação da realidade usando a Astrologia</span>, destravando questões práticas de negócios, carreira e relacionamentos. Inclui também o nosso <strong>grupo fechado no WhatsApp</strong> para troca diária e escolha dos temas dos encontros.</p>\n<p><strong>02. O Aplicativo da Bússola + Inteligência Diária:</strong> Você já aplica a Astrologia na rotina desde o primeiro dia. Nosso <strong>Aplicativo da Bússola</strong> cruza o seu Mapa Natal com os trânsitos do dia e mostra na tela do celular: <strong>qual área da sua vida está ativada hoje, até que horas dura o efeito</strong> e uma <span class=\"hl-amber\">Inteligência treinada no meu método</span> para você consultar decisões práticas na hora (<em>“devo fechar esse contrato esta semana?”</em>, <em>“como conduzir essa conversa difícil hoje?”</em>).</p>\n<p><strong>03. Formação Completa em Astrologia (Astrowake):</strong> A formação completa para você ter <strong>autonomia total de leitura</strong>. Você domina na prática a estrutura profunda de Planetas, Signos, Casas e Aspectos em aulas diretas ao ponto, sem precisar decorar listas ou tabelas. <span class=\"hl-amber\">Serve tanto para guiar as decisões da sua própria vida quanto para atuar e atender profissionalmente.</span></p>", "img": "assets/slides/slide_17.jpg"}, {"num": 18, "act": "O PASSAPORTE COMPLETO • PILARES 04 A 06", "title": "Durante 12 Meses Teremos... (Parte 2: Pilares 04, 05 e 06)", "cue": "Apresentar os Entregáveis 04 (Astrowake Trânsitos), 05 (+40 Masterclasses / Netflix) e 06 (Manual Visual)", "raw_script": "E olha nesta lâmina os outros três entregáveis que completam o seu passaporte anual:\n\n**04. Formação em Trânsitos (Astrowake Trânsitos):** O domínio completo dos **ciclos e previsões do tempo**. Você aprende a enxergar com ==meses de antecedência== quando uma área da sua vida financeira, profissional ou afetiva vai entrar em uma virada importante, sabendo exatamente **quando acelerar, quando cortar e como aproveitar cada janela de oportunidade**.\n\n**05. Acervo de Estudos de Caso (+40 Masterclasses):** A nossa verdadeira **Netflix de casos reais**. Mais de **40 aulas profundas gravadas** onde abrimos o Mapa e analisamos a mente e a trajetória de grandes personalidades (como **Ayrton Senna e Elon Musk**), além de aulas completas sobre o comportamento humano:\n• **A Síndrome do Bonzinho**\n• **Os 3 Amores**\n• **Como destravar a força de realização na vida real**.\n\n**06. Manual Visual de Consulta Rápida:** O manual visual e estruturado para você ter sempre à mão no computador ou no celular quando quiser checar rapidamente um posicionamento no Mapa ou **fazer uma leitura completa em poucos minutos**, sem nunca ficar no escuro.", "html_script": "<p>E olha nesta lâmina os outros três entregáveis que completam o seu passaporte anual:</p>\n<p><strong>04. Formação em Trânsitos (Astrowake Trânsitos):</strong> O domínio completo dos <strong>ciclos e previsões do tempo</strong>. Você aprende a enxergar com <span class=\"hl-amber\">meses de antecedência</span> quando uma área da sua vida financeira, profissional ou afetiva vai entrar em uma virada importante, sabendo exatamente <strong>quando acelerar, quando cortar e como aproveitar cada janela de oportunidade</strong>.</p>\n<p><strong>05. Acervo de Estudos de Caso (+40 Masterclasses):</strong> A nossa verdadeira <strong>Netflix de casos reais</strong>. Mais de <strong>40 aulas profundas gravadas</strong> onde abrimos o Mapa e analisamos a mente e a trajetória de grandes personalidades (como <strong>Ayrton Senna e Elon Musk</strong>), além de aulas completas sobre o comportamento humano:<br/>• <strong>A Síndrome do Bonzinho</strong><br/>• <strong>Os 3 Amores</strong><br/>• <strong>Como destravar a força de realização na vida real</strong>.</p>\n<p><strong>06. Manual Visual de Consulta Rápida:</strong> O manual visual e estruturado para você ter sempre à mão no computador ou no celular quando quiser checar rapidamente um posicionamento no Mapa ou <strong>fazer uma leitura completa em poucos minutos</strong>, sem nunca ficar no escuro.</p>", "img": "assets/slides/slide_18.jpg"}, {"num": 19, "act": "ATO IV • O NÍVEL DO NOSSO AMBIENTE", "title": "A Nossa Mesa: Quem Está Sentado Com Você?", "cue": "Os 4 perfis da mesa: Transição de Fase, Empresários, Terapeutas/Psicólogos e Profissionais Astrolegacy", "raw_script": "E quem está sentado nessa mesa com você pelos próximos 12 meses? Quando você atravessa a porta do Astrowake, você passa a caminhar ao lado de **quatro perfis de pessoas**:\n\n**01. Pessoas em Transição de Fase:** Que cansaram de bater cabeça no **modo difícil** e querem construir os próximos anos com clareza, direção e paz mental.\n\n**02. Empresários e Líderes:** Que usam a **leitura de perfil e de ciclos** para contratar melhor, entender sócios, negociar e acertar o timing dos negócios.\n\n**03. Terapeutas, Psicólogos e Mentores:** Que querem ==enxergar a raiz do problema do seu cliente em 15 minutos de conversa==, onde métodos comuns levariam seis meses.\n\n**04. Profissionais da Nova Geração (Movimento Astrolegacy):** Pessoas que decidiram **dominar essa ferramenta para orientar vidas com seriedade** e serem muito bem remuneradas por um trabalho que transforma destinos.\n\nE lembra da regra de ouro da nossa mesa: ==aqui dentro ninguém passa despercebido==. Não importa se você está começando do zero ou se já estuda há anos.", "html_script": "<p>E quem está sentado nessa mesa com você pelos próximos 12 meses? Quando você atravessa a porta do Astrowake, você passa a caminhar ao lado de <strong>quatro perfis de pessoas</strong>:</p>\n<p><strong>01. Pessoas em Transição de Fase:</strong> Que cansaram de bater cabeça no <strong>modo difícil</strong> e querem construir os próximos anos com clareza, direção e paz mental.</p>\n<p><strong>02. Empresários e Líderes:</strong> Que usam a <strong>leitura de perfil e de ciclos</strong> para contratar melhor, entender sócios, negociar e acertar o timing dos negócios.</p>\n<p><strong>03. Terapeutas, Psicólogos e Mentores:</strong> Que querem <span class=\"hl-amber\">enxergar a raiz do problema do seu cliente em 15 minutos de conversa</span>, onde métodos comuns levariam seis meses.</p>\n<p><strong>04. Profissionais da Nova Geração (Movimento Astrolegacy):</strong> Pessoas que decidiram <strong>dominar essa ferramenta para orientar vidas com seriedade</strong> e serem muito bem remuneradas por um trabalho que transforma destinos.</p>\n<p>E lembra da regra de ouro da nossa mesa: <span class=\"hl-amber\">aqui dentro ninguém passa despercebido</span>. Não importa se você está começando do zero ou se já estuda há anos.</p>", "img": "assets/slides/slide_19.jpg"}, {"num": 20, "act": "ATO V • CONDIÇÃO DE FUNDAÇÃO (BLACK FRIDAY)", "title": "O Convite de Embaixador & Ancoragem de Valor", "cue": "Explicar o papel de Embaixador + Empilhamento de valor separado (R$ 5.485,00/ano)", "raw_script": "Por estar aqui comigo hoje, no dia 15 de novembro, vendo essa egrégora nascer ao vivo sob o mapa das 19h30, você está recebendo o **Convite de Embaixador da Comunidade Astrowake**.\n\nOs **Embaixadores** são os membros que entram hoje na fundação deste novo modelo, caminham mais perto de mim durante os próximos **12 meses**, têm voz ativa na construção dos nossos encontros e garantem uma ==condição financeira única de Black Friday==.\n\nOlha o quadro à direita na tela com o valor real de cada pilar separado:\n• **Formação Completa Astrowake + Trânsitos:** R$ 1.997 / ano\n• **24 Encontros Quinzenais Ao Vivo (1 Ano):** R$ 1.997 / ano\n• **Acesso Anual ao Aplicativo da Bússola com IA:** R$ 997 / ano\n• **Acervo +40 Masterclasses e Estudos de Caso:** R$ 297 / ano\n• **Manual Visual de Consulta Rápida:** R$ 197 / ano\n\nSomando tudo, o valor que deveria ser cobrado separadamente é de ==R$ 5.485,00 por ano==. E perto do quanto custa tomar uma única decisão financeira errada ou passar mais um ano remando contra a maré, cinco mil reais já seria um investimento pequeno.", "html_script": "<p>Por estar aqui comigo hoje, no dia 15 de novembro, vendo essa egrégora nascer ao vivo sob o mapa das 19h30, você está recebendo o <strong>Convite de Embaixador da Comunidade Astrowake</strong>.</p>\n<p>Os <strong>Embaixadores</strong> são os membros que entram hoje na fundação deste novo modelo, caminham mais perto de mim durante os próximos <strong>12 meses</strong>, têm voz ativa na construção dos nossos encontros e garantem uma <span class=\"hl-amber\">condição financeira única de Black Friday</span>.</p>\n<p>Olha o quadro à direita na tela com o valor real de cada pilar separado:<br/>• <strong>Formação Completa Astrowake + Trânsitos:</strong> R$ 1.997 / ano<br/>• <strong>24 Encontros Quinzenais Ao Vivo (1 Ano):</strong> R$ 1.997 / ano<br/>• <strong>Acesso Anual ao Aplicativo da Bússola com IA:</strong> R$ 997 / ano<br/>• <strong>Acervo +40 Masterclasses e Estudos de Caso:</strong> R$ 297 / ano<br/>• <strong>Manual Visual de Consulta Rápida:</strong> R$ 197 / ano</p>\n<p>Somando tudo, o valor que deveria ser cobrado separadamente é de <span class=\"hl-amber\">R$ 5.485,00 por ano</span>. E perto do quanto custa tomar uma única decisão financeira errada ou passar mais um ano remando contra a maré, cinco mil reais já seria um investimento pequeno.</p>", "img": "assets/slides/slide_20.jpg"}, {"num": 21, "act": "FECHAMENTO BLACK FRIDAY • PORTAS ABERTAS", "title": "Portas Abertas: Bora pra Nave! (12x R$ 149,70)", "cue": "Revelar condição Embaixador (12x R$ 149,70 ou R$ 1.497 à vista) • Garantia de 7 dias • Suporte para entrada menor + parcelamento", "raw_script": "Mas hoje é o nascimento oficial da nossa Comunidade, e eu quero honrar cada pessoa lúcida que atendeu a esse chamado neste domingo. Por isso, entrando agora na nossa condição única de Black Friday como **Membro Embaixador**, você não vai investir R$ 5.485,00, nem metade disso.\n\nVocê garante o seu passaporte completo para os **12 meses da Comunidade Astrowake** por apenas:\n==12x de R$ 149,70== (ou **R$ 1.497,00 à vista**).\n\nPara e pensa nisso: dá **menos de R$ 5,00 por dia** para 1 ano inteiro de acompanhamento quinzenal comigo, Aplicativo da Bússola no bolso, Formação Completa e Formação em Trânsitos.\n\nE você entra com **Garantia Incondicional de 7 Dias**: entre agora, configure o seu Aplicativo da Bússola, assista às aulas e sinta a energia do nosso clã. Se em até 7 dias você achar que não foi o melhor investimento do seu ano, devolvemos **100% do seu dinheiro**.\n\n**Recado importante sobre limite de cartão:** Se você quer garantir sua vaga de Embaixador hoje na condição de Black Friday, mas está com o limite do cartão apertado e precisa dar uma **entrada menor agora e parcelar o restante**, chama imediatamente a minha equipe no link de suporte do WhatsApp que está no grupo, porque o nosso time comercial está de plantão agora para viabilizar a sua entrada!\n\n==O link de inscrição já está liberado aqui no chat e no Grupo de WhatsApp! Quem já estiver entrando agora, digita “TÔ NA NAVE” aqui no chat que eu quero dar as boas-vindas pelo nome! Bora pra nave!==", "html_script": "<p>Mas hoje é o nascimento oficial da nossa Comunidade, e eu quero honrar cada pessoa lúcida que atendeu a esse chamado neste domingo. Por isso, entrando agora na nossa condição única de Black Friday como <strong>Membro Embaixador</strong>, você não vai investir R$ 5.485,00, nem metade disso.</p>\n<p>Você garante o seu passaporte completo para os <strong>12 meses da Comunidade Astrowake</strong> por apenas:<br/><span class=\"hl-amber\">12x de R$ 149,70</span> (ou <strong>R$ 1.497,00 à vista</strong>).</p>\n<p>Para e pensa nisso: dá <strong>menos de R$ 5,00 por dia</strong> para 1 ano inteiro de acompanhamento quinzenal comigo, Aplicativo da Bússola no bolso, Formação Completa e Formação em Trânsitos.</p>\n<p>E você entra com <strong>Garantia Incondicional de 7 Dias</strong>: entre agora, configure o seu Aplicativo da Bússola, assista às aulas e sinta a energia do nosso clã. Se em até 7 dias você achar que não foi o melhor investimento do seu ano, devolvemos <strong>100% do seu dinheiro</strong>.</p>\n<p><strong>Recado importante sobre limite de cartão:</strong> Se você quer garantir sua vaga de Embaixador hoje na condição de Black Friday, mas está com o limite do cartão apertado e precisa dar uma <strong>entrada menor agora e parcelar o restante</strong>, chama imediatamente a minha equipe no link de suporte do WhatsApp que está no grupo, porque o nosso time comercial está de plantão agora para viabilizar a sua entrada!</p>\n<p><span class=\"hl-amber\">O link de inscrição já está liberado aqui no chat e no Grupo de WhatsApp! Quem já estiver entrando agora, digita “TÔ NA NAVE” aqui no chat que eu quero dar as boas-vindas pelo nome! Bora pra nave!</span></p>", "img": "assets/slides/slide_21.jpg"}];
+    let currentIndex = 0;
+    let autoScrolling = false;
+    let scrollSpeed = 3;
+    let syncSlideOnScroll = true;
+    let programmaticScroll = false;
+    let fontSize = 26;
+
+    const prompterCol = document.getElementById('prompter-column');
+    const streamEl = document.getElementById('script-stream');
+    const jumpListEl = document.getElementById('jump-list');
+    const monCounter = document.getElementById('mon-counter');
+    const monCurrImg = document.getElementById('mon-curr-img');
+    const monNextImg = document.getElementById('mon-next-img');
+    const monNextNum = document.getElementById('mon-next-num');
+
+    // Cross-tab communication channel so Teleprompter and Clean Slide Tab stay 100% synced
+    const channel = ('BroadcastChannel' in window) ? new BroadcastChannel('astrowake_presentation_sync') : null;
+
+    // Build all 21 continuous blocks + quick jump list
+    SLIDES.forEach((s, idx) => {
+      const numPad = String(s.num).padStart(2, '0');
+      const block = document.createElement('article');
+      block.className = 'script-block' + (idx === 0 ? ' active-slide' : '');
+      block.id = 'script-block-' + idx;
+      block.dataset.index = idx;
+      block.innerHTML = `
+        <div class="block-header">
+          <div class="block-badges">
+            <span class="slide-num-pill">SLIDE ${numPad} / 21</span>
+            <span class="on-air-indicator">● FALANDO AGORA (NO AR)</span>
+            <span class="block-title">${s.title}</span>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:var(--muted);">${s.act}</span>
+        </div>
+        <div class="block-cue">💡 <b>Foco desta lâmina:</b> ${s.cue}</div>
+        <div class="block-content">${s.html_script}</div>
+      `;
+      block.addEventListener('click', () => {
+        setActiveSlide(idx, true, true);
+      });
+      streamEl.appendChild(block);
+
+      const jItem = document.createElement('div');
+      jItem.className = 'jump-item' + (idx === 0 ? ' active' : '');
+      jItem.id = 'jump-item-' + idx;
+      jItem.innerHTML = `<span class="num">${numPad}</span> <span>${s.title}</span>`;
+      jItem.addEventListener('click', () => {
+        setActiveSlide(idx, true, true);
+      });
+      jumpListEl.appendChild(jItem);
+    });
+
+    function updateMonitorUI() {
+      const s = SLIDES[currentIndex];
+      const numPad = String(s.num).padStart(2, '0');
+      monCounter.textContent = `SLIDE ${numPad} / 21`;
+      monCurrImg.src = s.img;
+
+      if (currentIndex + 1 < SLIDES.length) {
+        const nextS = SLIDES[currentIndex + 1];
+        monNextNum.textContent = `SLIDE ${String(nextS.num).padStart(2, '0')} / 21`;
+        monNextImg.src = nextS.img;
+        monNextImg.style.opacity = '1';
+      } else {
+        monNextNum.textContent = 'FIM DA AULA';
+        monNextImg.style.opacity = '0.2';
+      }
+    }
+
+    function setActiveSlide(index, shouldScrollToBlock = true, broadcast = true) {
+      if (index < 0 || index >= SLIDES.length) return;
+      document.getElementById('script-block-' + currentIndex).classList.remove('active-slide');
+      document.getElementById('jump-item-' + currentIndex).classList.remove('active');
+
+      currentIndex = index;
+
+      const activeBlock = document.getElementById('script-block-' + currentIndex);
+      const activeJump = document.getElementById('jump-item-' + currentIndex);
+      activeBlock.classList.add('active-slide');
+      activeJump.classList.add('active');
+      activeJump.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+      updateMonitorUI();
+
+      if (shouldScrollToBlock) {
+        programmaticScroll = true;
+        const targetTop = activeBlock.offsetTop - 150;
+        prompterCol.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+        setTimeout(() => { programmaticScroll = false; }, 550);
+      }
+
+      if (broadcast) {
+        if (channel) channel.postMessage({ type: 'GO_TO_SLIDE', index: currentIndex });
+        try {
+          localStorage.setItem('astrowake_active_slide', JSON.stringify({ index: currentIndex, ts: Date.now() }));
+        } catch (e) {}
+        if (window.opener && !window.opener.closed && typeof window.opener.goToSlideFromTeleprompter === 'function') {
+          window.opener.goToSlideFromTeleprompter(currentIndex);
+        }
+      }
+    }
+
+    // Listen for slide changes coming from the Clean Slide Tab
+    if (channel) {
+      channel.onmessage = (ev) => {
+        if (ev.data && ev.data.type === 'SLIDE_CHANGED_FROM_STAGE' && ev.data.index !== currentIndex) {
+          setActiveSlide(ev.data.index, true, false);
+        }
+      };
+    }
+    window.addEventListener('storage', (ev) => {
+      if (ev.key === 'astrowake_stage_slide' && ev.newValue) {
+        try {
+          const data = JSON.parse(ev.newValue);
+          if (typeof data.index === 'number' && data.index !== currentIndex) {
+            setActiveSlide(data.index, true, false);
+          }
+        } catch (e) {}
+      }
+    });
+
+    // Expose direct hook for opener window
+    window.syncFromStage = function(idx) {
+      if (idx !== currentIndex) {
+        setActiveSlide(idx, true, false);
+      }
+    };
+
+    // Detect which slide block is in the Eye-Level Reading Zone when scrolling manually or via Auto-Scroll
+    prompterCol.addEventListener('scroll', () => {
+      if (!syncSlideOnScroll || programmaticScroll) return;
+      const readingLineY = prompterCol.scrollTop + 210;
+      let bestIdx = currentIndex;
+      for (let i = 0; i < SLIDES.length; i++) {
+        const el = document.getElementById('script-block-' + i);
+        const top = el.offsetTop;
+        const bottom = top + el.offsetHeight;
+        if (readingLineY >= top && readingLineY <= bottom) {
+          bestIdx = i;
+          break;
+        }
+      }
+      if (bestIdx !== currentIndex) {
+        setActiveSlide(bestIdx, false, true);
+      }
+    });
+
+    // Auto-scroll loop
+    const btnAutoScroll = document.getElementById('btn-autoscroll');
+    const speedSlider = document.getElementById('speed-slider');
+    const speedVal = document.getElementById('speed-val');
+
+    speedSlider.addEventListener('input', () => {
+      scrollSpeed = Number(speedSlider.value);
+      speedVal.textContent = scrollSpeed + 'x';
+    });
+
+    btnAutoScroll.addEventListener('click', () => {
+      autoScrolling = !autoScrolling;
+      btnAutoScroll.textContent = autoScrolling ? '⏸ Rolagem Automática: ON' : '▶ Rolagem Automática: OFF';
+      btnAutoScroll.classList.toggle('active-toggle', autoScrolling);
+    });
+
+    let lastFrameTime = performance.now();
+    function autoScrollStep(now) {
+      const dt = (now - lastFrameTime) / 1000;
+      lastFrameTime = now;
+      if (autoScrolling) {
+        // 14 pixels per second * speed multiplier
+        prompterCol.scrollTop += (12 * scrollSpeed) * dt;
+      }
+      requestAnimationFrame(autoScrollStep);
+    }
+    requestAnimationFrame(autoScrollStep);
+
+    // Toggle scroll-to-slide sync
+    const btnScrollSync = document.getElementById('btn-scroll-sync');
+    btnScrollSync.addEventListener('click', () => {
+      syncSlideOnScroll = !syncSlideOnScroll;
+      btnScrollSync.textContent = syncSlideOnScroll ? '🔗 Sincronizar Slide ao Rolar: ON' : '🔗 Sincronizar Slide ao Rolar: OFF';
+      btnScrollSync.classList.toggle('active-toggle', syncSlideOnScroll);
+    });
+
+    // Font size controls
+    document.getElementById('btn-font-inc').addEventListener('click', () => {
+      fontSize = Math.min(42, fontSize + 2);
+      document.documentElement.style.setProperty('--font-size-script', fontSize + 'px');
+    });
+    document.getElementById('btn-font-dec').addEventListener('click', () => {
+      fontSize = Math.max(18, fontSize - 2);
+      document.documentElement.style.setProperty('--font-size-script', fontSize + 'px');
+    });
+
+    // Open Clean Stage Tab for Google Meet
+    document.getElementById('btn-open-clean-stage').addEventListener('click', () => {
+      if (window.opener && !window.opener.closed) {
+        window.opener.focus();
+      } else {
+        window.open('index.html?view=slides', '_blank');
+      }
+    });
+
+    // Prev / Next buttons
+    document.getElementById('mon-prev').addEventListener('click', () => {
+      if (currentIndex > 0) setActiveSlide(currentIndex - 1, true, true);
+    });
+    document.getElementById('mon-next').addEventListener('click', () => {
+      if (currentIndex < SLIDES.length - 1) setActiveSlide(currentIndex + 1, true, true);
+    });
+
+    // Keyboard shortcuts inside Teleprompter Studio
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (currentIndex < SLIDES.length - 1) setActiveSlide(currentIndex + 1, true, true);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (currentIndex > 0) setActiveSlide(currentIndex - 1, true, true);
+      } else if (e.key === ' ') {
+        // Space toggles auto-scroll inside the teleprompter window!
+        e.preventDefault();
+        btnAutoScroll.click();
+      }
+    });
+
+    updateMonitorUI();
+  </script>
+</body>
+</html>
